@@ -14,7 +14,13 @@ export default function RaiseIssuePage() {
     e.preventDefault();
     if (!title || !region) return;
 
-    addIssue(title, region, severity);
+    addIssue({
+  id: Date.now(),
+  title,
+  region,
+  severity,
+  status: "Pending",
+});
 
     setTitle("");
     setRegion("");
