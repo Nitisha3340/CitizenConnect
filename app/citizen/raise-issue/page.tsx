@@ -17,15 +17,25 @@ export default function RaiseIssuePage() {
     e.preventDefault();
     if (!title || !region || !user) return;
 
-    addIssue({
-      id: Date.now(),
-      title,
-      region,
-      severity,
-      status: "Pending",
-      createdBy: user.name,
-      userId: user.id,
-    });
+    const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!title || !region || !user) return;
+
+  addIssue({
+    id: Date.now(),
+    title,
+    region,
+    severity,
+    status: "Pending",
+    createdBy: user.name,
+    userId: user.id,
+    email: user.email,
+  });
+
+  setTitle("");
+  setRegion("");
+  setSeverity("Low");
+};
 
     setTitle("");
     setRegion("");
