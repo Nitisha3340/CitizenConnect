@@ -1,9 +1,10 @@
 "use client";
 
-import { IssueProvider } from "@/context/IssueContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { IssueProvider } from "@/context/IssueContext";
+import { AnnouncementProvider } from "@/context/AnnouncementContext";
 
-export default function Providers({
+export function Providers({
   children,
 }: {
   children: React.ReactNode;
@@ -11,7 +12,9 @@ export default function Providers({
   return (
     <AuthProvider>
       <IssueProvider>
-        {children}
+        <AnnouncementProvider>
+          {children}
+        </AnnouncementProvider>
       </IssueProvider>
     </AuthProvider>
   );

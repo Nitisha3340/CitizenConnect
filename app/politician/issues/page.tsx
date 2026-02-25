@@ -1,33 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useIssues } from "@/context/IssueContext";
 
 export default function IssuesPage() {
-  const [status, setStatus] = useState("Pending");
+  const { issues, updateStatus } = useIssues();
 
   return (
     <div>
       <h1 className="text-3xl font-bold mb-8">Manage Issues</h1>
 
-      <div className="bg-white text-black p-6 rounded-lg">
-        <h3 className="font-semibold mb-4">Water Leakage - Sector 5</h3>
+      {issues.length === 0 && (
+        <p className="text-gray-400">No issues submitted yet.</p>
+      )}
 
-        <p className="mb-4">Severity: High</p>
+      <div className="space-y-6">
+        {issues.map((issue) => (
+          <div
+            key={issue.id}
+            className="bg-white text-black p-6 rounded-lg shadow-md"
+          >
+            <h3 className="font-semibold text-lg mb-2">
+              {issue.title}
+            </h3>
 
-        <label className="block mb-2 font-medium">Update Status</label>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="border p-2 rounded-md mb-4"
-        >
-          <option>Pending</option>
-          <option>In Progress</option>
-          <option>Resolved</option>
-        </select>
+            <p className="mb-1">
+              <strong>Region:</strong> {issue.region}
+            </p>
 
-        <button className="bg-indigo-600 text-white px-5 py-2 rounded-md">
-          Save Status
-        </button>
+            <p className="mb-1">
+              <strong>Severity:</strong> {issue.severity}
+            </p>
+
+            <p className="mb-1">
+              <strong>Raised By:</strong> {issue.createdBy}
+            </p>
+
+            <p className="mb-4">
+              <strong>Current Status:</strong> {issue.status}
+            </p>
+
+            <label className="block mb-2 font-medium">
+              Update Status
+            </label>
+
+            <select
+              value={issue.status}
+              onChange={(e) =>
+                updateStatus(
+                  issue.id,
+                  e.target.value as
+                    | "Pending"
+                    | "In Progress"
+                    | "Resolved"
+                )
+              }
+              className="border p-2 rounded-md mb-4"
+            >
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+          </div>
+        ))}
       </div>
     </div>
   );

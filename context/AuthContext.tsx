@@ -10,6 +10,7 @@ export type Role =
   | "politician";
 
 type User = {
+  id: string;        // ✅ Added unique ID
   name: string;
   email: string;
   role: Role;
@@ -17,7 +18,7 @@ type User = {
 
 type AuthContextType = {
   user: User | null;
-  login: (user: User) => void;
+  login: (user: Omit<User, "id">) => void;
   logout: () => void;
 };
 
@@ -34,9 +35,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = (userData: User) => {
-    localStorage.setItem("authUser", JSON.stringify(userData));
-    setUser(userData);
+  const login = (userData: Omit<User, "id">) => {
+    const userWithId: User = {
+      ...userData,
+      id: userData.email, // ✅ Use email as unique ID
+    };
+
+    localStorage.setItem("authUser", JSON.stringify(userWithId));
+    setUser(userWithId);
   };
 
   const logout = () => {

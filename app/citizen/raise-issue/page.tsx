@@ -2,25 +2,30 @@
 
 import { useState } from "react";
 import { useIssues } from "@/context/IssueContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function RaiseIssuePage() {
   const { addIssue } = useIssues();
+  const { user } = useAuth();
 
   const [title, setTitle] = useState("");
   const [region, setRegion] = useState("");
-  const [severity, setSeverity] = useState<"Low" | "Medium" | "High">("Low");
+  const [severity, setSeverity] =
+    useState<"Low" | "Medium" | "High">("Low");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !region) return;
+    if (!title || !region || !user) return;
 
     addIssue({
-  id: Date.now(),
-  title,
-  region,
-  severity,
-  status: "Pending",
-});
+      id: Date.now(),
+      title,
+      region,
+      severity,
+      status: "Pending",
+      createdBy: user.name,
+      userId: user.id,
+    });
 
     setTitle("");
     setRegion("");
@@ -35,7 +40,6 @@ export default function RaiseIssuePage() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
 
-        {/* Title */}
         <input
           type="text"
           placeholder="Issue Title"
@@ -44,7 +48,6 @@ export default function RaiseIssuePage() {
           className="w-full p-3 bg-white/10 text-white rounded-lg"
         />
 
-        {/* Region */}
         <select
           value={region}
           onChange={(e) => setRegion(e.target.value)}
@@ -57,7 +60,6 @@ export default function RaiseIssuePage() {
           <option value="West Zone">West Zone</option>
         </select>
 
-        {/* Severity */}
         <select
           value={severity}
           onChange={(e) =>
