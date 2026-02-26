@@ -15,27 +15,19 @@ export default function RaiseIssuePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!title || !region || !user) return;
 
-    const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!title || !region || !user) return;
-
-  addIssue({
-    id: Date.now(),
-    title,
-    region,
-    severity,
-    status: "Pending",
-    createdBy: user.name,
-    userId: user.id,
-    email: user.email,
-  });
-
-  setTitle("");
-  setRegion("");
-  setSeverity("Low");
-};
+    addIssue({
+      id: Date.now(),
+      title,
+      region,
+      severity,
+      status: "Pending",
+      createdBy: user.name,
+      userId: user.id,
+      email: user.email,
+    });
 
     setTitle("");
     setRegion("");
@@ -49,7 +41,6 @@ export default function RaiseIssuePage() {
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-
         <input
           type="text"
           placeholder="Issue Title"
