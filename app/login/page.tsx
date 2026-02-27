@@ -10,6 +10,7 @@ export default function LoginPage() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("citizen");
   const [error, setError] = useState("");
 
@@ -18,6 +19,8 @@ export default function LoginPage() {
 
   const validateEmail = (value: string) =>
     /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(value);
+
+  const validatePassword = (value: string) => value.length >= 6;
 
   const handleLogin = () => {
     if (!validateName(name)) {
@@ -30,7 +33,12 @@ export default function LoginPage() {
       return;
     }
 
-    login({ name, email, role });
+    if (!validatePassword(password)) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    login({ name, email, password, role });
 
     router.push(`/${role}/dashboard`);
   };
@@ -62,6 +70,14 @@ export default function LoginPage() {
         className="w-full border border-gray-300 p-2 mb-3 rounded text-black"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <input
+        type="password"
+        placeholder="Password (min 6 characters)"
+        className="w-full border border-gray-300 p-2 mb-3 rounded text-black"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
       />
 
       <select
