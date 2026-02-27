@@ -44,9 +44,9 @@ export default function LoginPage() {
   };
 
   return (
-  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-white dark:from-indigo-900 dark:via-purple-900 dark:to-black">
-    <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl w-96">
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">
+  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-black">
+    <div className="bg-white p-8 rounded-xl shadow-2xl w-96">
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
         CitizenConnect Login
       </h2>
 
@@ -67,7 +67,7 @@ export default function LoginPage() {
       <input
         type="email"
         placeholder="Email (@gmail.com)"
-        className="w-full border border-gray-300 p-2 mb-3 rounded text-black dark:text-white dark:bg-gray-700"
+        className="w-full border border-gray-300 p-2 mb-3 rounded text-black"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
@@ -75,13 +75,13 @@ export default function LoginPage() {
       <input
         type="password"
         placeholder="Password (min 6 characters)"
-        className="w-full border border-gray-300 p-2 mb-3 rounded text-black dark:text-white dark:bg-gray-700"
+        className="w-full border border-gray-300 p-2 mb-3 rounded text-black"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
       <select
-        className="w-full border border-gray-300 p-2 mb-4 rounded text-black dark:text-white dark:bg-gray-700"
+        className="w-full border border-gray-300 p-2 mb-4 rounded text-black"
         value={role}
         onChange={(e) =>
           setRole(e.target.value as Role)
