@@ -4,6 +4,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { IssueProvider } from "@/context/IssueContext";
 import { AnnouncementProvider } from "@/context/AnnouncementContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 export function Providers({
   children,
@@ -15,7 +16,9 @@ export function Providers({
       <IssueProvider>
         <AnnouncementProvider>
           <LanguageProvider>
-            {children}
+            <ThemeProvider>
+              {children}
+            </ThemeProvider>
           </LanguageProvider>
         </AnnouncementProvider>
       </IssueProvider>
