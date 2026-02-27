@@ -9,7 +9,8 @@ export default function LanguageSwitcher() {
     <select
       value={lang}
       onChange={(e) => setLang(e.target.value as any)}
-      className="rounded-md px-2 py-1 text-sm"
+      className="rounded-md px-2 py-1 text-sm bg-white text-black border border-gray-300 cursor-pointer"
+      style={{ maxHeight: "40px" }}
     >
       <option value="en">English</option>
       <option value="hi">हिन्दी</option>

@@ -192,13 +192,30 @@ const LanguageContext = createContext<LanguageContextProps>({
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Language>("en");
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+    // Load language from localStorage on mount
+    const savedLang = localStorage.getItem("language") as Language | null;
+    if (savedLang && (["en", "hi", "es", "fr", "zh", "ar", "ru", "pt", "de", "ja"] as Language[]).includes(savedLang)) {
+      setLang(savedLang);
+    }
+  }, []);
+
+  const handleSetLang = (newLang: Language) => {
+    setLang(newLang);
+    if (isClient) {
+      localStorage.setItem("language", newLang);
+    }
+  };
 
   const t = (key: string) => {
     return translations[lang]?.[key] || key;
   };
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang, t }}>
+    <LanguageContext.Provider value={{ lang, setLang: handleSetLang, t }}>
       {children}
     </LanguageContext.Provider>
   );
