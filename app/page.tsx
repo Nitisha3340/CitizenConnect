@@ -74,11 +74,6 @@ export default function HomePage() {
             {t("whereLeadershipListens")}
           </motion.h2>
 
-          <p className="text-gray-400 max-w-2xl mx-auto mb-8">
-            A digital bridge between citizens and policymakers —
-            enabling transparency, accountability, and real-time civic engagement.
-          </p>
-
           {/* Live Issue Ticker */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -150,7 +145,11 @@ export default function HomePage() {
       <section className="py-24 px-6">
 
         <h2 className="text-4xl font-bold text-center mb-16">
+<<<<<<< HEAD
           {t("platformImpact")}
+=======
+          Platform Impact
+>>>>>>> friend/main
         </h2>
 
         <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto text-center">
@@ -166,7 +165,11 @@ export default function HomePage() {
               <CountUp end={1284} duration={2} />+
             </h3>
             <p className="mt-4 text-gray-400 text-lg">
+<<<<<<< HEAD
               {t("issuesReported")}
+=======
+              Issues Reported
+>>>>>>> friend/main
             </p>
           </motion.div>
 
@@ -181,7 +184,11 @@ export default function HomePage() {
               <CountUp end={87} duration={2} />%
             </h3>
             <p className="mt-4 text-gray-400 text-lg">
+<<<<<<< HEAD
               {t("resolutionRate")}
+=======
+              Resolution Rate
+>>>>>>> friend/main
             </p>
           </motion.div>
 
@@ -196,7 +203,11 @@ export default function HomePage() {
               <CountUp end={24} duration={2} />h
             </h3>
             <p className="mt-4 text-gray-400 text-lg">
+<<<<<<< HEAD
               {t("avgResponseTime")}
+=======
+              Avg Response Time
+>>>>>>> friend/main
             </p>
           </motion.div>
 
