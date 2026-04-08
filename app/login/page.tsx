@@ -4,6 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, Role } from "@/context/AuthContext";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "http://localhost:8080";
+
 export default function LoginPage() {
   const { login, setOtpVerified } = useAuth();
   const router = useRouter();
@@ -22,7 +27,9 @@ export default function LoginPage() {
 
   const validatePassword = (value: string) => value.length >= 6;
 
-  const handleLogin = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleLogin = async () => {
     if (!validateName(name)) {
       setError("Name must start with a Capital letter.");
       return;
@@ -38,10 +45,45 @@ export default function LoginPage() {
       return;
     }
 
-    login({ name, email, password, role });
-    localStorage.setItem("postOtpRedirect", `/${role}/dashboard`);
-    setOtpVerified(false);
-    router.push("/otp-verification");
+    setError("");
+    setIsSubmitting(true);
+    try {
+      // Trigger backend login so it can send OTP (backend is unchanged).
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const message =
+          data?.message ||
+          data?.error ||
+          `Login failed (API ${res.status}). Check NEXT_PUBLIC_API_URL.`;
+        setError(message);
+        return;
+      }
+
+      // Keep local auth user for UI; token is optional depending on backend flow.
+      login({ name, email, password, role });
+
+      const token =
+        data?.token || data?.accessToken || data?.data?.token || data?.authToken;
+      if (token) localStorage.setItem("token", token);
+
+      localStorage.setItem("postOtpRedirect", `/${role}/dashboard`);
+      setOtpVerified(false);
+      router.push("/otp-verification");
+    } catch (e: unknown) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Login failed. Unable to reach backend. Check NEXT_PUBLIC_API_URL."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -96,9 +138,10 @@ export default function LoginPage() {
 
       <button
         onClick={handleLogin}
-        className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition font-semibold"
+        disabled={isSubmitting}
+        className="w-full bg-indigo-600 disabled:opacity-60 text-white py-2 rounded hover:bg-indigo-700 transition font-semibold"
       >
-        Login
+        {isSubmitting ? "Logging in..." : "Login"}
       </button>
     </div>
   </div>

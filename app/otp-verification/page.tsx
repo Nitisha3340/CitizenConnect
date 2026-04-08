@@ -71,13 +71,22 @@ export default function OTPVerificationPage() {
   const handleResend = async () => {
     setError("");
     try {
-      await fetch(`${API_BASE_URL}/auth/resend-otp`, {
+      const res = await fetch(`${API_BASE_URL}/auth/resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const message =
+          data?.message ||
+          data?.error ||
+          `Failed to resend OTP (API ${res.status}). Check NEXT_PUBLIC_API_URL.`;
+        setError(message);
+        return;
+      }
     } catch {
-      setError("Failed to resend OTP. Please try again.");
+      setError("Failed to resend OTP. Unable to reach backend. Check NEXT_PUBLIC_API_URL.");
     }
   };
 
