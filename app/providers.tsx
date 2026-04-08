@@ -12,16 +12,16 @@ export function Providers({
   children: React.ReactNode;
 }) {
   return (
-    <AuthProvider>
-      <IssueProvider>
-        <AnnouncementProvider>
-          <LanguageProvider>
-            <ThemeProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <IssueProvider>
+          <AnnouncementProvider>
+            <LanguageProvider>
               {children}
-            </ThemeProvider>
-          </LanguageProvider>
-        </AnnouncementProvider>
-      </IssueProvider>
-    </AuthProvider>
+            </LanguageProvider>
+          </AnnouncementProvider>
+        </IssueProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

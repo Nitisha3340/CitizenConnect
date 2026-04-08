@@ -5,14 +5,13 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
-import { useTheme } from "@/context/ThemeContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 
 export default function Navbar() {
   const { logout } = useAuth();
   const router = useRouter();
   const { t } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="sticky top-0 z-50 bg-[#0b1120] dark:bg-white border-b border-white/10 dark:border-gray-200">
@@ -34,13 +33,8 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
+          <ThemeSwitcher />
           <LanguageSwitcher />
-          <button
-            onClick={toggleTheme}
-            className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-md text-sm"
-          >
-            {theme === "dark" ? "☀️" : "🌙"}
-          </button>
           <button
             onClick={() => router.push("/login")}
             className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition"
