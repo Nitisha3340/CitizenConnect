@@ -137,10 +137,6 @@ export default function OTPVerificationPage() {
         >
           Resend OTP
         </button>
-
-        <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-          OTP expires in 5 minutes. This is a frontend-only demo flow (no email/backend).
-        </p>
       </div>
     </div>
   );
