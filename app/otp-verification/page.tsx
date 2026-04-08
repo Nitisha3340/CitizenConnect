@@ -17,18 +17,10 @@ export default function OTPVerificationPage() {
   const [info, setInfo] = useState<string>("");
 
   const email = useMemo(() => user?.email || "", [user?.email]);
-  const [demoOtp, setDemoOtp] = useState<string>("");
 
   useEffect(() => {
     if (!email) router.replace("/login");
   }, [email, router]);
-
-  useEffect(() => {
-    // Frontend-only OTP: show current OTP to user (since no backend/email).
-    const storedEmail = localStorage.getItem("otpEmail");
-    const storedOtp = localStorage.getItem("otpCode");
-    if (storedEmail && storedEmail === email && storedOtp) setDemoOtp(storedOtp);
-  }, [email]);
 
   const redirectAfterOtp = () => {
     const redirectTo = localStorage.getItem("postOtpRedirect");
@@ -82,7 +74,6 @@ export default function OTPVerificationPage() {
     const newOtp = generateOtp();
     localStorage.setItem("otpCode", newOtp);
     localStorage.setItem("otpIssuedAt", String(Date.now()));
-    setDemoOtp(newOtp);
     setInfo("A new OTP was generated.");
   };
 
@@ -95,12 +86,6 @@ export default function OTPVerificationPage() {
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 text-center">
           Enter the 6-digit OTP for <span className="font-semibold">{email}</span>.
         </p>
-
-        {!!demoOtp && (
-          <div className="mb-4 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 text-sm text-indigo-900 dark:border-indigo-900/40 dark:bg-indigo-900/20 dark:text-indigo-100">
-            Demo OTP: <span className="font-mono font-semibold">{demoOtp}</span>
-          </div>
-        )}
 
         {error && (
           <p className="text-red-600 mb-4 text-sm font-medium">
