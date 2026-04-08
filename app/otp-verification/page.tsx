@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
-const API_BASE_URL = "/api";
+function generateOtp() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
 
 export default function OTPVerificationPage() {
   const router = useRouter();
@@ -12,13 +14,21 @@ export default function OTPVerificationPage() {
 
   const [otp, setOtp] = useState("");
   const [error, setError] = useState<string>("");
-  const [isVerifying, setIsVerifying] = useState(false);
+  const [info, setInfo] = useState<string>("");
 
   const email = useMemo(() => user?.email || "", [user?.email]);
+  const [demoOtp, setDemoOtp] = useState<string>("");
 
   useEffect(() => {
     if (!email) router.replace("/login");
   }, [email, router]);
+
+  useEffect(() => {
+    // Frontend-only OTP: show current OTP to user (since no backend/email).
+    const storedEmail = localStorage.getItem("otpEmail");
+    const storedOtp = localStorage.getItem("otpCode");
+    if (storedEmail && storedEmail === email && storedOtp) setDemoOtp(storedOtp);
+  }, [email]);
 
   const redirectAfterOtp = () => {
     const redirectTo = localStorage.getItem("postOtpRedirect");
@@ -26,67 +36,54 @@ export default function OTPVerificationPage() {
     router.replace(redirectTo || (user ? `/${user.role}/dashboard` : "/login"));
   };
 
-  const handleVerify = async () => {
+  const handleVerify = () => {
     if (otp.length !== 6) {
       setError("Please enter a valid 6-digit OTP.");
       return;
     }
 
     setError("");
-    setIsVerifying(true);
-    try {
-      // Backend is not modified. If the endpoint exists, we'll use it.
-      const res = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ otp, email }),
-      });
+    setInfo("");
 
-      const data = await res.json().catch(() => ({}));
-      const serverVerified = Boolean(res.ok && data?.success);
+    const expectedEmail = localStorage.getItem("otpEmail");
+    const expectedOtp = localStorage.getItem("otpCode");
+    const issuedAt = Number(localStorage.getItem("otpIssuedAt") || "0");
+    const isExpired = issuedAt ? Date.now() - issuedAt > 5 * 60 * 1000 : false;
 
-      const devBypass = process.env.NODE_ENV !== "production" && otp === "123456";
-      if (!serverVerified && !devBypass) {
-        setError("Invalid OTP. Please try again.");
-        return;
-      }
-
-      if (data?.token) localStorage.setItem("token", data.token);
-      setOtpVerified(true);
-      redirectAfterOtp();
-    } catch {
-      const devBypass = process.env.NODE_ENV !== "production" && otp === "123456";
-      if (devBypass) {
-        setOtpVerified(true);
-        redirectAfterOtp();
-        return;
-      }
-      setError("OTP verification failed. Please try again.");
-    } finally {
-      setIsVerifying(false);
+    if (!expectedEmail || expectedEmail !== email || !expectedOtp) {
+      setError("OTP session not found. Please login again.");
+      return;
     }
+    if (isExpired) {
+      setError("OTP expired. Please resend OTP.");
+      return;
+    }
+    if (otp !== expectedOtp) {
+      setError("Invalid OTP. Please try again.");
+      return;
+    }
+
+    localStorage.removeItem("otpCode");
+    localStorage.removeItem("otpIssuedAt");
+    setOtpVerified(true);
+    redirectAfterOtp();
   };
 
-  const handleResend = async () => {
+  const handleResend = () => {
     setError("");
-    try {
-      const res = await fetch(`${API_BASE_URL}/auth/resend-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        const message =
-          data?.message ||
-          data?.error ||
-          `Failed to resend OTP (API ${res.status}). Check NEXT_PUBLIC_API_URL.`;
-        setError(message);
-        return;
-      }
-    } catch {
-      setError("Failed to resend OTP. Unable to reach backend. Check NEXT_PUBLIC_API_URL.");
+    setInfo("");
+
+    const expectedEmail = localStorage.getItem("otpEmail");
+    if (!expectedEmail || expectedEmail !== email) {
+      setError("OTP session not found. Please login again.");
+      return;
     }
+
+    const newOtp = generateOtp();
+    localStorage.setItem("otpCode", newOtp);
+    localStorage.setItem("otpIssuedAt", String(Date.now()));
+    setDemoOtp(newOtp);
+    setInfo("A new OTP was generated.");
   };
 
   return (
@@ -96,12 +93,24 @@ export default function OTPVerificationPage() {
           OTP Verification
         </h2>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 text-center">
-          Enter the 6-digit OTP sent to <span className="font-semibold">{email}</span>.
+          Enter the 6-digit OTP for <span className="font-semibold">{email}</span>.
         </p>
+
+        {!!demoOtp && (
+          <div className="mb-4 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 text-sm text-indigo-900 dark:border-indigo-900/40 dark:bg-indigo-900/20 dark:text-indigo-100">
+            Demo OTP: <span className="font-mono font-semibold">{demoOtp}</span>
+          </div>
+        )}
 
         {error && (
           <p className="text-red-600 mb-4 text-sm font-medium">
             {error}
+          </p>
+        )}
+
+        {info && (
+          <p className="text-green-700 mb-4 text-sm font-medium">
+            {info}
           </p>
         )}
 
@@ -117,10 +126,9 @@ export default function OTPVerificationPage() {
 
         <button
           onClick={handleVerify}
-          disabled={isVerifying}
-          className="w-full bg-indigo-600 disabled:opacity-60 text-white py-2 rounded hover:bg-indigo-700 transition font-semibold mb-3"
+          className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition font-semibold mb-3"
         >
-          {isVerifying ? "Verifying..." : "Verify OTP"}
+          Verify OTP
         </button>
 
         <button
@@ -130,11 +138,9 @@ export default function OTPVerificationPage() {
           Resend OTP
         </button>
 
-        {process.env.NODE_ENV !== "production" && (
-          <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-            Dev tip: use <span className="font-mono">123456</span> if the OTP API isn’t available.
-          </p>
-        )}
+        <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+          OTP expires in 5 minutes. This is a frontend-only demo flow (no email/backend).
+        </p>
       </div>
     </div>
   );
