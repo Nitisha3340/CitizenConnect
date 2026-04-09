@@ -25,7 +25,7 @@ export default function OfficeSettings() {
           className="w-full border p-2 rounded-md"
         />
 
-        <button className="bg-indigo-600 text-white px-6 py-2 rounded-md">
+        <button className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:opacity-90 transition duration-200">
           Save Office Details
         </button>
       </div>

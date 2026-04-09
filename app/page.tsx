@@ -36,14 +36,14 @@ export default function HomePage() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.push("/login")}
-              className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition"
+              className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition duration-200"
             >
               Login
             </button>
 
             <button
               onClick={logout}
-              className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition"
+              className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition duration-200"
             >
               Logout
             </button>

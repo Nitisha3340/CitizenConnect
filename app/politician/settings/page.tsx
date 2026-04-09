@@ -52,7 +52,7 @@ export default function PoliticianSettingsPage() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-md capitalize ${
+            className={`px-4 py-2 rounded-md capitalize hover:opacity-90 transition duration-200 ${
               activeTab === tab
                 ? "bg-indigo-600 text-white"
                 : "bg-gray-200 text-black"

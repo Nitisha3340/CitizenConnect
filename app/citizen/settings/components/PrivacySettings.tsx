@@ -13,7 +13,7 @@ export default function PrivacySettings() {
       <Setting label="Make Profile Public" state={publicProfile} setState={setPublicProfile} />
       <Setting label="Allow Data Sharing for Analytics" state={dataShare} setState={setDataShare} />
 
-      <button className="mt-6 bg-gray-800 text-white px-5 py-2 rounded-md">
+      <button className="mt-6 bg-gray-800 text-white px-5 py-2 rounded-md hover:opacity-90 transition duration-200">
         Download My Data (PDF)
       </button>
     </div>

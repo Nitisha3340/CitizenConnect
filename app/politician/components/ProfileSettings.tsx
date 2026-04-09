@@ -84,7 +84,7 @@ export default function ProfileSettings() {
         </div>
 
         {/* Save Button */}
-        <button className="bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700 transition">
+        <button className="bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700 transition duration-200 hover:opacity-90">
           Save Changes
         </button>
       </div>

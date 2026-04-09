@@ -17,7 +17,7 @@ export default function IssuesPage() {
         {issues.map((issue) => (
           <div
             key={issue.id}
-            className="bg-white text-black p-6 rounded-lg shadow-md"
+            className="bg-white text-black p-6 rounded-lg shadow-md hover:bg-white/10 transition"
           >
             <h3 className="font-semibold text-lg mb-2">
               {issue.title}

@@ -1,5 +1,4 @@
-
-import "./globals.css";
+import { Toaster } from "react-hot-toast"
 import { IssueProvider } from "@/context/IssueContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { Providers } from "./providers";
@@ -16,10 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>
-          {children}
-        </Providers>
-      </body>
+  <Toaster position="top-right" />
+  {children}
+</body>
     </html>
   );
 }

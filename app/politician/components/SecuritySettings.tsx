@@ -8,15 +8,15 @@ export default function SecuritySettings() {
       </h3>
 
       <div className="space-y-4">
-        <button className="bg-red-500 text-white px-4 py-2 rounded-md">
+        <button className="bg-red-500 text-white px-4 py-2 rounded-md hover:opacity-90 transition duration-200">
           Change Password
         </button>
 
-        <button className="bg-indigo-600 text-white px-4 py-2 rounded-md">
+        <button className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:opacity-90 transition duration-200">
           Enable Two-Factor Authentication
         </button>
 
-        <button className="bg-gray-800 text-white px-4 py-2 rounded-md">
+        <button className="bg-gray-800 text-white px-4 py-2 rounded-md hover:opacity-90 transition duration-200">
           View Login History
         </button>
       </div>

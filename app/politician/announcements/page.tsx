@@ -88,7 +88,7 @@ export default function AnnouncementsPage() {
 
         <button
           onClick={handlePublish}
-          className="mt-4 bg-indigo-600 hover:bg-indigo-700 transition text-white px-6 py-2 rounded-md"
+          className="mt-4 bg-indigo-600 hover:bg-indigo-700 transition duration-200 text-white px-6 py-2 rounded-md hover:opacity-90"
         >
           Publish Announcement
         </button>
