@@ -1,4 +1,17 @@
-export default function ProfileSettings() {
+import { useState } from "react";
+
+export default function ProfileSettings({ setError }: { setError: (error: string) => void }) {
+  const [name, setName] = useState("");
+
+  const handleSave = () => {
+    if (!name) {
+      setError("Name required");
+      return;
+    }
+
+    // continue save logic
+  };
+
   return (
     <div className="bg-white text-black p-8 rounded-xl shadow-lg max-w-3xl">
       <h3 className="text-2xl font-semibold mb-6">Profile & Account</h3>
@@ -8,7 +21,7 @@ export default function ProfileSettings() {
         <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-xl">
           N
         </div>
-        <button className="bg-gray-800 text-white px-4 py-2 rounded-md">
+        <button className="bg-gray-800 text-white px-4 py-2 rounded-md hover:opacity-90 transition duration-200">
           Upload Photo
         </button>
       </div>
@@ -29,7 +42,7 @@ export default function ProfileSettings() {
         <p>Member Since: Jan 2026</p>
       </div>
 
-      <button className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-md">
+      <button onClick={handleSave} className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-md hover:opacity-90 transition duration-200">
         Save Changes
       </button>
     </div>

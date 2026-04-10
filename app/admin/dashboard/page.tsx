@@ -2,17 +2,25 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 
 export default function AdminDashboard() {
   const { logout } = useAuth();
   const router = useRouter();
 
+  // ✅ NOW INSIDE COMPONENT (correct)
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      router.push("/login");
+    }
+  }, [router]);
+
   return (
     <div className="min-h-screen bg-[#0b1120] text-white p-10">
-
-      {/* ================= HEADER ================= */}
-      <div className="flex justify-between items-center mb-12">
+      
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-10">
         <div>
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <p className="text-gray-400 mt-2">
@@ -22,7 +30,7 @@ export default function AdminDashboard() {
 
         <button
           onClick={logout}
-          className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition"
+          className="bg-white text-black px-4 py-2 rounded-md hover:opacity-90 transition duration-200"
         >
           Logout
         </button>

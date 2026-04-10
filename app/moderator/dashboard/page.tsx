@@ -1,11 +1,31 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { useIssues } from "@/context/IssueContext";
+import { useEffect, useState } from "react";
+import API from "@/app/api/api";
+import { useRouter } from "next/navigation";
 
 export default function ModeratorDashboard() {
   const { logout } = useAuth();
-  const { issues, deleteIssue } = useIssues();
+  const router = useRouter();
+
+  const [issues, setIssues] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      router.push("/login");
+    }
+  }, []);
+
+  useEffect(() => {
+    API.get("/complaints")
+      .then((res: any) => setIssues(res.data));
+  }, []);
+
+  const deleteIssue = async (id: number) => {
+    await API.delete(`/complaints/${id}`);
+    setIssues(issues.filter((i: any) => i.id !== id));
+  };
 
   return (
     <div className="min-h-screen bg-[#0b1120] text-white p-10">
@@ -15,7 +35,7 @@ export default function ModeratorDashboard() {
 
         <button
           onClick={logout}
-          className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition"
+          className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition duration-200"
         >
           Logout
         </button>
@@ -31,10 +51,10 @@ export default function ModeratorDashboard() {
         )}
 
         <div className="space-y-6">
-          {issues.map((issue) => (
+          {issues.map((issue: any) => (
             <div
               key={issue.id}
-              className="bg-white/5 border border-white/10 p-6 rounded-xl flex justify-between items-center"
+              className="bg-white/5 border border-white/10 p-6 rounded-xl flex justify-between items-center hover:bg-white/10 transition"
             >
               <div>
                 <h3 className="font-semibold">
@@ -50,7 +70,7 @@ export default function ModeratorDashboard() {
 
               <button
                 onClick={() => deleteIssue(issue.id)}
-                className="bg-red-600 px-4 py-2 rounded-md hover:opacity-80"
+                className="bg-red-600 px-4 py-2 rounded-md hover:opacity-90 transition duration-200"
               >
                 Delete
               </button>

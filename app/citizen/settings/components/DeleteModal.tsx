@@ -16,12 +16,12 @@ export default function DeleteModal({ onClose }: Props) {
         <div className="flex justify-end gap-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-md border"
+            className="px-4 py-2 rounded-md border hover:opacity-90 transition duration-200"
           >
             Cancel
           </button>
 
-          <button className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700">
+          <button className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 hover:opacity-90 transition duration-200">
             Delete
           </button>
         </div>

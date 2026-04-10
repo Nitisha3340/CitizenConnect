@@ -1,38 +1,64 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { useIssues } from "@/context/IssueContext";
 import { useAuth } from "@/context/AuthContext";
+
 
 export default function RaiseIssuePage() {
   const { addIssue } = useIssues();
   const { user } = useAuth();
-
+  
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [region, setRegion] = useState("");
   const [severity, setSeverity] =
     useState<"Low" | "Medium" | "High">("Low");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    if (!title || !region || !user) return;
+const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
 
-    addIssue({
-      id: Date.now(),
+  if (!title) {
+    setError("Title is required");
+    return;
+  }
+
+  if (!description) {
+    setError("Description is required");
+    return;
+  }
+
+  setError("");
+  setLoading(true);
+
+  try {
+    await addIssue({
       title,
-      region,
-      severity,
+      description,
       status: "Pending",
-      createdBy: user.name,
-      userId: user.id,
-      email: user.email,
+      severity,
+      region,
+      createdBy: user?.name || "Citizen",
+      userId: user?.id || user?.email || "guest",
+      email: user?.email || "guest@example.com"
     });
 
+    toast.success("Issue submitted successfully");
     setTitle("");
+    setDescription("");
     setRegion("");
     setSeverity("Low");
-  };
+
+  } catch (err: any) {
+    setError(err?.response?.data?.message || err?.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="bg-white/5 p-8 rounded-2xl border border-white/10 max-w-2xl">
@@ -47,6 +73,13 @@ export default function RaiseIssuePage() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full p-3 bg-white/10 text-white rounded-lg"
+        />
+
+        <textarea
+          placeholder="Describe the issue"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-full min-h-32 p-3 bg-white/10 text-white rounded-lg"
         />
 
         <select
@@ -73,12 +106,15 @@ export default function RaiseIssuePage() {
           <option value="High">High Severity</option>
         </select>
 
+        {error && <p className="text-red-500 mb-2">{error}</p>}
+
         <button
           type="submit"
-          className="bg-gradient-to-r from-purple-500 to-indigo-500 px-6 py-3 rounded-lg text-white"
-        >
-          Submit Issue
-        </button>
+          disabled={loading}
+          className="bg-purple-600 px-4 py-2 rounded hover:opacity-90 transition duration-200"
+         >
+           {loading ? "Submitting..." : "Submit Issue"}
+          </button>
       </form>
     </div>
   );

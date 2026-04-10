@@ -14,7 +14,7 @@ export default function NotificationSettings() {
         <Toggle label="Weekly Performance Report" />
       </div>
 
-      <button className="mt-6 bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">
+      <button className="mt-6 bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 hover:opacity-90 transition duration-200">
         Save Changes
       </button>
     </div>

@@ -20,7 +20,7 @@ export default function SecuritySettings() {
         <p>Android - Logged in 2 days ago</p>
       </div>
 
-      <button className="bg-red-600 text-white px-5 py-2 rounded-md">
+      <button className="bg-red-600 text-white px-5 py-2 rounded-md hover:opacity-90 transition duration-200">
         Logout From All Devices
       </button>
     </div>

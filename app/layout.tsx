@@ -1,8 +1,7 @@
-
 import "./globals.css";
-import { IssueProvider } from "@/context/IssueContext";
-import { AuthProvider } from "@/context/AuthContext";
+import { Toaster } from "react-hot-toast";
 import { Providers } from "./providers";
+
 export const metadata = {
   title: "CitizenConnect",
   description: "Civic Issue Reporting Platform",
@@ -15,9 +14,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="bg-gray-50 text-gray-900">
         <Providers>
-          {children}
+          {/* Toast Notifications */}
+          <Toaster position="top-right" />
+
+          {/* Main App */}
+          <div className="min-h-screen flex flex-col">
+            {children}
+          </div>
         </Providers>
       </body>
     </html>

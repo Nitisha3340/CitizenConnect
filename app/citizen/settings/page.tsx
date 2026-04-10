@@ -11,7 +11,7 @@ import AdvancedSettings from "./components/AdvancedSettings";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
-
+  const [error, setError] = useState("");
   const tabs = [
     { id: "profile", label: "Profile" },
     { id: "notifications", label: "Notifications" },
@@ -24,7 +24,7 @@ export default function SettingsPage() {
   const renderContent = () => {
     switch (activeTab) {
       case "profile":
-        return <ProfileSettings />;
+        return <ProfileSettings setError={setError}/>;
       case "notifications":
         return <NotificationSettings />;
       case "security":
@@ -36,7 +36,7 @@ export default function SettingsPage() {
       case "advanced":
         return <AdvancedSettings />;
       default:
-        return <ProfileSettings />;
+        return <ProfileSettings setError={setError}/>;
     }
   };
 
@@ -45,13 +45,21 @@ export default function SettingsPage() {
       <h1 className="text-3xl font-bold text-white mb-8">
         Advanced Settings
       </h1>
+        
+         {/* ✅ SHOW ERROR HERE */}
+      {error && (
+        <p className="text-red-500 mb-4 font-medium">
+          {error}
+        </p>
+      )}
+      
 
       <div className="flex flex-wrap gap-4 mb-8">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-5 py-2 rounded-md transition ${
+            className={`px-5 py-2 rounded-md hover:opacity-90 transition duration-200 ${
               activeTab === tab.id
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-black hover:bg-gray-300"

@@ -52,7 +52,7 @@ export default function TrendingPage() {
           <p className="text-gray-400">No high severity issues.</p>
         ) : (
           highSeverity.map((issue) => (
-            <div key={issue.id} className="py-2 border-b border-white/10">
+            <div key={issue.id} className="py-2 border-b border-white/10 hover:bg-white/10 transition">
               {issue.title} — {issue.region}
             </div>
           ))

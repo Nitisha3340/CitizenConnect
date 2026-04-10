@@ -1,10 +1,12 @@
 @import "tailwindcss";
 
+/* Root Theme */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f9fafb; /* light gray for modern UI */
+  --foreground: #111827;
 }
 
+/* Inline Theme (keep your config) */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -12,6 +14,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,12 +22,40 @@
   }
 }
 
+/* Base Styling */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
+/* Smooth UI feel */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Reusable Card */
+.card {
+  @apply bg-white rounded-xl shadow-md p-5;
+}
+
+/* Button Styles */
+.btn-primary {
+  @apply bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300;
+}
+
+/* Input Fields */
+.input {
+  @apply w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400;
+}
+
+/* Gradient Glow Effect (your original, improved) */
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -38,4 +69,18 @@ body {
               radial-gradient(circle at 80% 70%, rgba(59,130,246,0.15), transparent 40%);
   animation: gradientShift 12s ease infinite;
   z-index: 0;
+}
+
+/* Scrollbar (optional but nice UI touch) */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

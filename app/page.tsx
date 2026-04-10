@@ -40,16 +40,23 @@ export default function HomePage() {
           <div className="flex items-center gap-4">
             <ThemeSwitcher />
             <LanguageSwitcher />
-            <button
-              onClick={() => router.push("/login")}
-              className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition"
+            <Link
+              href="/login"
+              className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition duration-200"
             >
               {t("login")}
-            </button>
+            </Link>
+
+            <Link
+              href="/signup"
+              className="bg-cyan-400 text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition duration-200"
+            >
+              Sign up
+            </Link>
 
             <button
               onClick={logout}
-              className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition"
+              className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition duration-200"
             >
               {t("logout")}
             </button>

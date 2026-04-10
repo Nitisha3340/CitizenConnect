@@ -1,56 +1,132 @@
 "use client";
 
-import { useIssues } from "@/context/IssueContext";
+
+
 import { useAuth } from "@/context/AuthContext";
+import LogoutButton from "@/components/LogoutButton";
+import { useEffect, useState } from "react";
+import { useIssues } from "@/context/IssueContext";
 
-export default function MyIssuesPage() {
-  const { issues } = useIssues();
+import { useRouter } from "next/navigation";
+
+
+
+
+
+export default function DashboardPage() {
   const { user } = useAuth();
+  const { issues } = useIssues();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
-  const myIssues = issues.filter(
-    (issue) => issue.userId === user?.id
+  const [data, setData] = useState<{
+  total: number;
+  inProgress: number;
+  resolved: number;
+  recent: any[];
+}>({
+  total: 0,
+  inProgress: 0,
+  resolved: 0,
+  recent: []
+});
+  // 🔐 Route protection
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      router.push("/login");
+    }
+  }, []);
+  useEffect(() => {
+    setLoading(true);
+
+    const userIssues = user
+      ? issues.filter((issue) => issue.email === user.email)
+      : [];
+
+    setData({
+      total: userIssues.length,
+      inProgress: userIssues.filter((issue) => issue.status === "In Progress").length,
+      resolved: userIssues.filter((issue) => issue.status === "Resolved").length,
+      recent: userIssues.slice(0, 3)
+    });
+
+    setLoading(false);
+
+}, [issues, user]);
+
+  if (loading) {
+    return <p className="text-white">Loading issues...</p>;
+  }
+
+    function Card({ title, value }: { title: string; value: number }) {
+        return (
+    <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
+      <h3 className="text-gray-400 mb-2">{title}</h3>
+      <p className="text-3xl font-bold text-purple-400">
+        {value}
+      </p>
+    </div>
   );
+}
+
+   function Issue({ title, status }: { title: string; status: string }) {
+  return (
+    <div className="flex justify-between bg-white/5 p-4 rounded-xl border border-white/10 hover:bg-white/10 transition">
+      <span>{title}</span>
+      <span className="text-sm text-gray-400">
+        {status}
+      </span>
+    </div>
+  );
+}
 
   return (
-    <div className="space-y-8">
-      <h2 className="text-3xl font-bold mb-8">My Issues</h2>
-
-      <div className="relative border-l-4 border-gray-600 pl-8 space-y-10">
-
-        {myIssues.length === 0 && (
-          <p className="text-gray-400">
-            No issues raised yet.
+    <>
+      <div className="flex justify-between items-center mb-10">
+        <div>
+          <h1 className="text-2xl font-bold">
+            Welcome, {user?.name} 👋
+          </h1>
+          <p className="text-gray-400 text-sm">
+            Here’s an overview of your activity.
           </p>
-        )}
+        </div>
 
-        {myIssues.map((issue) => (
-          <div
-            key={issue.id}
-            className="relative bg-white/5 border border-white/10 p-6 rounded-xl shadow-lg"
-          >
-            <div className="absolute -left-11 top-6 w-5 h-5 bg-blue-600 rounded-full border-4 border-[#0b1120]" />
-
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">
-                {issue.title}
-              </h3>
-
-              <span className="text-sm px-4 py-1 rounded-full bg-gray-700">
-                {issue.status}
-              </span>
-            </div>
-
-            <p className="text-gray-400 mt-2">
-              Region: {issue.region} | Severity: {issue.severity}
-            </p>
-
-            <p className="text-gray-500 text-sm mt-1">
-              Created on: {new Date(issue.id).toLocaleDateString("en-GB")}
-            </p>
-          </div>
-        ))}
+        <LogoutButton />
 
       </div>
-    </div>
+
+      <div className="grid md:grid-cols-3 gap-6 mb-10">
+        <Card title="Total Issues" value={data.total} />
+        <Card title="In Progress" value={data.inProgress} />
+        <Card title="Resolved" value={data.resolved} />
+      </div>
+
+      <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
+        <h2 className="text-xl font-semibold mb-4">
+          Recent Issues
+        </h2>
+
+        <div className="space-y-4">
+          {data.total === 0 && (
+            <p className="text-gray-400 text-center mt-10">
+  🚀 No issues yet — start by raising one!
+</p>
+          )}
+
+          {data.recent.map((issue: any) => (
+            <Issue
+              key={issue.id}
+              title={issue.title}
+              status={issue.status}
+            />
+          ))}
+
+        </div>
+      </div>
+
+      
+
+    </>
   );
 }
