@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { saveOtp } from "@/app/api/otp/store";
+import { sendOtpEmail } from "@/app/api/otp/mail";
 
 type RequestBody = {
   email?: string;
@@ -30,11 +31,36 @@ export async function POST(req: Request) {
     const otpHash = sha256(`${secret}:${email}:${purpose}:${otp}`);
     const persisted = await saveOtp(email, purpose, otpHash);
 
+    let mailResult: Awaited<ReturnType<typeof sendOtpEmail>>;
+    try {
+      mailResult = await sendOtpEmail(email, otp, purpose);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Failed to send OTP email";
+      return NextResponse.json({ message: msg }, { status: 500 });
+    }
+
+    if (!mailResult.sent) {
+      if (process.env.NODE_ENV === "production") {
+        return NextResponse.json(
+          {
+            message:
+              "Email delivery is not configured. Set SMTP_USER and SMTP_PASSWORD (Gmail App Password) in the server environment.",
+          },
+          { status: 503 }
+        );
+      }
+    }
+
     return NextResponse.json({
       ok: true,
-      message: "OTP generated",
+      message: mailResult.sent
+        ? "OTP sent to your email"
+        : "OTP generated (configure SMTP to receive email)",
       storage: persisted.backend,
-      ...(process.env.NODE_ENV !== "production" ? { devOtp: otp } : {}),
+      emailSent: mailResult.sent,
+      ...(process.env.NODE_ENV !== "production" && !mailResult.sent
+        ? { devOtp: otp }
+        : {}),
     });
   } catch (e: unknown) {
     return NextResponse.json(

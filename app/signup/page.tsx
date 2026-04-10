@@ -4,11 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { Role, useAuth } from "@/context/AuthContext";
+import { Role } from "@/context/AuthContext";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { register } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -71,10 +70,12 @@ export default function SignupPage() {
         throw new Error(data?.message || "Failed to request OTP");
       }
 
-      if (data?.devOtp) {
-        toast.success(`OTP sent (dev): ${data.devOtp}`);
+      if (data?.emailSent) {
+        toast.success("Check your Gmail inbox for the verification code.");
+      } else if (data?.devOtp) {
+        toast.success(`Dev mode — OTP (no SMTP): ${data.devOtp}`);
       } else {
-        toast.success("OTP sent. Please verify to continue.");
+        toast.success("OTP ready. Please verify to continue.");
       }
 
       router.push(`/otp?email=${encodeURIComponent(normalizedEmail)}&purpose=signup`);

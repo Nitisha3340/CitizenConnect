@@ -48,8 +48,13 @@ export default function OtpPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || "Failed to resend OTP");
-      if (data?.devOtp) toast.success(`OTP resent (dev): ${data.devOtp}`);
-      else toast.success("OTP resent");
+      if (data?.emailSent) {
+        toast.success("New code sent — check your Gmail inbox.");
+      } else if (data?.devOtp) {
+        toast.success(`Dev — OTP: ${data.devOtp}`);
+      } else {
+        toast.success("OTP resent");
+      }
     } catch (e: any) {
       const msg = e?.message || "Failed to resend OTP";
       setError(msg);
