@@ -1,14 +1,18 @@
 import axios from "axios";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+
 const API = axios.create({
-  baseURL: "http://localhost:8080"
+  baseURL: API_BASE_URL
 });
 
 API.interceptors.request.use((req: any) => {
-  const token = localStorage.getItem("token");
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
 
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
+    if (token) {
+      req.headers.Authorization = `Bearer ${token}`;
+    }
   }
 
   return req;

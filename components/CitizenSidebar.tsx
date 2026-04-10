@@ -2,11 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 
 export default function CitizenSidebar() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(true);
 
   const navItems = [
     { name: "Dashboard", href: "/citizen/dashboard" },
@@ -17,10 +15,15 @@ export default function CitizenSidebar() {
   ];
 
   return (
-    <div className="h-screen w-64 bg-gradient-to-b from-[#0f172a] to-[#1e293b] text-white p-6 flex flex-col">
-      <h1 className="text-xl font-bold mb-8">Citizen Panel</h1>
+    <aside className="h-screen w-64 bg-gradient-to-b from-[#0f172a] to-[#020617] text-white p-6 flex flex-col border-r border-white/10">
+      
+      {/* Logo / Title */}
+      <h1 className="text-2xl font-bold mb-10 text-purple-400 tracking-wide">
+        CitizenConnect
+      </h1>
 
-      <nav className="flex flex-col gap-3">
+      {/* Navigation */}
+      <nav className="flex flex-col gap-2">
         {navItems.map((item) => {
           const active = pathname === item.href;
 
@@ -28,21 +31,28 @@ export default function CitizenSidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`px-4 py-2 rounded-lg transition ${
+              className={`px-4 py-2 rounded-lg transition duration-200 flex items-center justify-between ${
                 active
-                  ? "bg-purple-600"
+                  ? "bg-purple-600 text-white shadow-md"
                   : "hover:bg-white/10 text-gray-300"
               }`}
             >
               {item.name}
+
+              {/* Active indicator */}
+              {active && (
+                <span className="w-2 h-2 bg-white rounded-full"></span>
+              )}
             </Link>
           );
         })}
       </nav>
 
-      <div className="mt-auto text-sm text-gray-400 pt-10">
-        CitizenConnect © 2026
+      {/* Bottom Footer */}
+      <div className="mt-auto pt-10 text-xs text-gray-500 border-t border-white/10">
+        <p>Citizen Panel</p>
+        <p className="mt-1">© 2026 CitizenConnect</p>
       </div>
-    </div>
+    </aside>
   );
 }

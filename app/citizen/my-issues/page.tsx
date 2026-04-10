@@ -5,7 +5,7 @@
 import { useAuth } from "@/context/AuthContext";
 import LogoutButton from "@/components/LogoutButton";
 import { useEffect, useState } from "react";
-import API from "@/app/api/api";
+import { useIssues } from "@/context/IssueContext";
 
 import { useRouter } from "next/navigation";
 
@@ -15,9 +15,9 @@ import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { issues } = useIssues();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [issues, setIssues] = useState<any[]>([]);
 
   const [data, setData] = useState<{
   total: number;
@@ -37,24 +37,22 @@ export default function DashboardPage() {
     }
   }, []);
   useEffect(() => {
-  setLoading(true);
+    setLoading(true);
 
-  API.get("/complaints/my")
-    .then((res: any) => {
-      setIssues(res.data);
-      const issues = res.data;
+    const userIssues = user
+      ? issues.filter((issue) => issue.email === user.email)
+      : [];
 
-      setData({
-        total: issues.length,
-        inProgress: issues.filter((i: any) => i.status === "IN_PROGRESS").length,
-        resolved: issues.filter((i: any) => i.status === "RESOLVED").length,
-        recent: issues.slice(0, 3)
-      });
-    })
-    .catch(() => alert("Error loading issues"))
-    .finally(() => setLoading(false));
+    setData({
+      total: userIssues.length,
+      inProgress: userIssues.filter((issue) => issue.status === "In Progress").length,
+      resolved: userIssues.filter((issue) => issue.status === "Resolved").length,
+      recent: userIssues.slice(0, 3)
+    });
 
-}, []);
+    setLoading(false);
+
+}, [issues, user]);
 
   if (loading) {
     return <p className="text-white">Loading issues...</p>;
@@ -110,7 +108,7 @@ export default function DashboardPage() {
         </h2>
 
         <div className="space-y-4">
-          {issues.length === 0 && (
+          {data.total === 0 && (
             <p className="text-gray-400 text-center mt-10">
   🚀 No issues yet — start by raising one!
 </p>

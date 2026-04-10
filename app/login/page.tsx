@@ -1,10 +1,10 @@
 "use client";
 
-import API from "@/app/api/api";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, Role } from "@/context/AuthContext";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -56,14 +56,13 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await API.post("/auth/login", {
+      await login({
+        name,
         email,
-        password
+        password,
+        role
       });
 
-      localStorage.setItem("token", res.data);
-
-      login({ name, email, role });
       toast.success("Login successful");
 
       if (role === "admin") router.push("/admin/dashboard");
@@ -72,7 +71,12 @@ export default function LoginPage() {
       else router.push("/citizen/dashboard");
 
     } catch (err: any) {
-      toast.error("Invalid credentials");
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Login failed. Please sign up first, then log in.";
+      setError(message);
+      toast.error(message);
     }
 
     setLoading(false);
@@ -137,6 +141,13 @@ export default function LoginPage() {
         >
           {loading ? "Logging in..." : "Login"}
         </button>
+
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Don’t have an account?{" "}
+          <Link href="/signup" className="font-semibold text-indigo-600 hover:underline">
+            Sign up first
+          </Link>
+        </p>
 
       </div>
     </div>

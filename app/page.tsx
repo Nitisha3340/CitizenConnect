@@ -42,6 +42,13 @@ export default function HomePage() {
             </button>
 
             <button
+              onClick={() => router.push("/signup")}
+              className="bg-cyan-400 text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition duration-200"
+            >
+              Signup
+            </button>
+
+            <button
               onClick={logout}
               className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition duration-200"
             >

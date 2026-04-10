@@ -4,7 +4,6 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useIssues } from "@/context/IssueContext";
 import { useAuth } from "@/context/AuthContext";
-import API from "@/app/api/api";
 
 
 export default function RaiseIssuePage() {
@@ -20,7 +19,8 @@ export default function RaiseIssuePage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-const handleSubmit = async () => {
+const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
 
   if (!title) {
     setError("Title is required");
@@ -36,20 +36,28 @@ const handleSubmit = async () => {
   setLoading(true);
 
   try {
-    await API.post("/complaints", {
+    await addIssue({
       title,
       description,
+      status: "Pending",
       severity,
-      region
+      region,
+      createdBy: user?.name || "Citizen",
+      userId: user?.id || user?.email || "guest",
+      email: user?.email || "guest@example.com"
     });
 
     toast.success("Issue submitted successfully");
+    setTitle("");
+    setDescription("");
+    setRegion("");
+    setSeverity("Low");
 
   } catch (err: any) {
-    setError(err.response?.data?.message || "Something went wrong");
+    setError(err?.response?.data?.message || err?.message || "Something went wrong");
+  } finally {
+    setLoading(false);
   }
-
-  setLoading(false);
 };
 
   return (
@@ -65,6 +73,13 @@ const handleSubmit = async () => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full p-3 bg-white/10 text-white rounded-lg"
+        />
+
+        <textarea
+          placeholder="Describe the issue"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-full min-h-32 p-3 bg-white/10 text-white rounded-lg"
         />
 
         <select
@@ -94,7 +109,7 @@ const handleSubmit = async () => {
         {error && <p className="text-red-500 mb-2">{error}</p>}
 
         <button
-          onClick={handleSubmit}
+          type="submit"
           disabled={loading}
           className="bg-purple-600 px-4 py-2 rounded hover:opacity-90 transition duration-200"
          >

@@ -1,10 +1,12 @@
 "use client";
 
+import API from "@/app/api/api";
 import { createContext, useContext, useEffect, useState } from "react";
 
 export interface Issue {
   id: number;
   title: string;
+  description?: string;
   status: "Pending" | "In Progress" | "Resolved";
   severity: "Low" | "Medium" | "High";
   region: string;
@@ -15,75 +17,87 @@ export interface Issue {
 
 interface IssueContextType {
   issues: Issue[];
-  addIssue: (issue: Issue) => void;
-  updateStatus: (id: number, status: Issue["status"]) => void;
-  deleteIssue: (id: number) => void;
+  loading: boolean;
+  refreshIssues: () => Promise<void>;
+  addIssue: (issue: Omit<Issue, "id">) => Promise<void>;
+  updateStatus: (id: number, status: Issue["status"]) => Promise<void>;
+  deleteIssue: (id: number) => Promise<void>;
 }
 
 const IssueContext = createContext<IssueContextType | null>(null);
 
+function normalizeStatus(status: any): Issue["status"] {
+  const normalized = String(status || "").toUpperCase();
+
+  if (normalized === "IN_PROGRESS" || normalized === "IN PROGRESS") return "In Progress";
+  if (normalized === "RESOLVED") return "Resolved";
+  if (normalized === "PENDING") return "Pending";
+  return status || "Pending";
+}
+
+function toApiStatus(status: Issue["status"]) {
+  if (status === "In Progress") return "IN_PROGRESS";
+  if (status === "Resolved") return "RESOLVED";
+  return "PENDING";
+}
+
+function normalizeIssue(issue: any, fallbackId = Date.now()): Issue {
+  return {
+    id: Number(issue.id ?? fallbackId),
+    title: issue.title,
+    description: issue.description,
+    status: normalizeStatus(issue.status),
+    severity: issue.severity || "Low",
+    region: issue.region || "",
+    createdBy: issue.createdBy || issue.created_by || issue.email || "Unknown",
+    userId: issue.userId || issue.user_id || issue.email || "",
+    email: issue.email || issue.userEmail || "",
+  };
+}
+
 export function IssueProvider({ children }: { children: React.ReactNode }) {
   const [issues, setIssues] = useState<Issue[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refreshIssues = async () => {
+    setLoading(true);
+
+    try {
+      const response = await API.get("/complaints");
+      const payload = Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || [];
+
+      setIssues(payload.map(normalizeIssue));
+    } catch {
+      setIssues([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const stored = localStorage.getItem("issues");
-
-    if (stored) {
-      const parsed = JSON.parse(stored);
-
-      if (parsed.length > 0) {
-        setIssues(parsed);
-        return;
-      }
-    }
-
-    // 🔥 Always seed if empty
-    const demoIssues: Issue[] = [
-      {
-        id: 1001,
-        title: "Garbage not collected for 3 days",
-        status: "Pending",
-        severity: "High",
-        region: "North Zone",
-        createdBy: "Rahul Sharma",
-        userId: "rahul@gmail.com",
-        email: "rahul@gmail.com",
-      },
-      {
-        id: 1002,
-        title: "Street light flickering",
-        status: "In Progress",
-        severity: "Medium",
-        region: "South Zone",
-        createdBy: "Anita Verma",
-        userId: "anita@gmail.com",
-        email: "anita@gmail.com",
-      },
-      {
-        id: 1003,
-        title: "False complaint about loud music",
-        status: "Pending",
-        severity: "Low",
-        region: "East Zone",
-        createdBy: "Fake User",
-        userId: "fake@gmail.com",
-        email: "fake@gmail.com",
-      },
-    ];
-
-    localStorage.setItem("issues", JSON.stringify(demoIssues));
-    setIssues(demoIssues);
+    void refreshIssues();
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("issues", JSON.stringify(issues));
-  }, [issues]);
+    const handleAuthChange = () => {
+      void refreshIssues();
+    };
 
-  const addIssue = (issue: Issue) => {
-    setIssues((prev) => [issue, ...prev]);
+    window.addEventListener("auth-changed", handleAuthChange);
+
+    return () => window.removeEventListener("auth-changed", handleAuthChange);
+  }, []);
+
+  const addIssue = async (issue: Omit<Issue, "id">) => {
+    const response = await API.post("/complaints", issue);
+    const createdIssue = normalizeIssue(response.data?.data || response.data || issue);
+    setIssues((prev) => [createdIssue, ...prev]);
   };
 
-  const updateStatus = (id: number, status: Issue["status"]) => {
+  const updateStatus = async (id: number, status: Issue["status"]) => {
+    await API.patch(`/complaints/${id}`, { status: toApiStatus(status) });
     setIssues((prev) =>
       prev.map((issue) =>
         issue.id === id ? { ...issue, status } : issue
@@ -91,13 +105,14 @@ export function IssueProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const deleteIssue = (id: number) => {
+  const deleteIssue = async (id: number) => {
+    await API.delete(`/complaints/${id}`);
     setIssues((prev) => prev.filter((issue) => issue.id !== id));
   };
 
   return (
     <IssueContext.Provider
-      value={{ issues, addIssue, updateStatus, deleteIssue }}
+      value={{ issues, loading, refreshIssues, addIssue, updateStatus, deleteIssue }}
     >
       {children}
     </IssueContext.Provider>
