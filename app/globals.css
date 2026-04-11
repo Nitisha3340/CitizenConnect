@@ -1,28 +1,17 @@
 @import "tailwindcss";
 
-/* Root Theme */
 :root {
-  --background: #f9fafb; /* light gray for modern UI */
+  --background: #f9fafb;
   --foreground: #111827;
 }
 
-/* Inline Theme (keep your config) */
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-/* Dark Mode */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-/* Base Styling */
 body {
   background: var(--background);
   color: var(--foreground);
@@ -31,31 +20,38 @@ body {
   padding: 0;
 }
 
-/* Smooth UI feel */
 * {
   transition: all 0.2s ease-in-out;
 }
 
-/* Reusable Card */
 .card {
-  @apply bg-white rounded-xl shadow-md p-5;
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  padding: 1.25rem;
 }
 
-/* Button Styles */
 .btn-primary {
-  @apply bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600;
+  background: #3b82f6;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
 }
 
 .btn-secondary {
-  @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300;
+  background: #e5e7eb;
+  color: #1f2937;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
 }
 
-/* Input Fields */
 .input {
-  @apply w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400;
+  width: 100%;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
 }
 
-/* Gradient Glow Effect (your original, improved) */
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -71,7 +67,6 @@ body {
   z-index: 0;
 }
 
-/* Scrollbar (optional but nice UI touch) */
 ::-webkit-scrollbar {
   width: 6px;
 }

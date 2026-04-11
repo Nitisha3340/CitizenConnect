@@ -1,67 +1,34 @@
 "use client";
 
 import { useIssues } from "@/context/IssueContext";
+import IssueTable from "@/components/IssueTable";
+import StatsCard from "@/components/StatsCard";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 
 export default function IssuesPage() {
-  const { issues, updateStatus } = useIssues();
+  const { issues, updateStatus, loading } = useIssues();
+
+  if (loading) {
+    return <LoadingSkeleton cards={3} rows={3} />;
+  }
+
+  const openIssues = issues.filter((issue) => issue.status !== "Resolved").length;
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8">Manage Issues</h1>
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatsCard title="Total Issues" value={issues.length} />
+        <StatsCard title="Open Issues" value={openIssues} />
+        <StatsCard title="Resolved" value={issues.filter((issue) => issue.status === "Resolved").length} />
+      </div>
 
-      {issues.length === 0 && (
-        <p className="text-gray-400">No issues submitted yet.</p>
-      )}
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-lg">
+        <div className="mb-6">
+          <p className="text-xs uppercase tracking-[0.35em] text-cyan-300">Manage Issues</p>
+          <h1 className="mt-2 text-3xl font-semibold text-white">Zone issues</h1>
+        </div>
 
-      <div className="space-y-6">
-        {issues.map((issue) => (
-          <div
-            key={issue.id}
-            className="bg-white text-black p-6 rounded-lg shadow-md hover:bg-white/10 transition"
-          >
-            <h3 className="font-semibold text-lg mb-2">
-              {issue.title}
-            </h3>
-
-            <p className="mb-1">
-              <strong>Region:</strong> {issue.region}
-            </p>
-
-            <p className="mb-1">
-              <strong>Severity:</strong> {issue.severity}
-            </p>
-
-            <p className="mb-1">
-              <strong>Raised By:</strong> {issue.createdBy}
-            </p>
-
-            <p className="mb-4">
-              <strong>Current Status:</strong> {issue.status}
-            </p>
-
-            <label className="block mb-2 font-medium">
-              Update Status
-            </label>
-
-            <select
-              value={issue.status}
-              onChange={(e) =>
-                updateStatus(
-                  issue.id,
-                  e.target.value as
-                    | "Pending"
-                    | "In Progress"
-                    | "Resolved"
-                )
-              }
-              className="border p-2 rounded-md mb-4"
-            >
-              <option value="Pending">Pending</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Resolved">Resolved</option>
-            </select>
-          </div>
-        ))}
+        <IssueTable issues={issues} onStatusChange={(id, status) => void updateStatus(id, status)} />
       </div>
     </div>
   );

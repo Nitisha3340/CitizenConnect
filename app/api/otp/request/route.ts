@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const purpose = (body.purpose || "signup").trim();
 
     if (!email) {
-      return NextResponse.json({ message: "Email is required" }, { status: 400 });
+      return NextResponse.json({ success: false, message: "Email is required" }, { status: 400 });
     }
 
     const otp = generateOtp();
@@ -40,31 +40,37 @@ export async function POST(req: Request) {
     }
 
     if (!mailResult.sent) {
-      if (process.env.NODE_ENV === "production") {
-        return NextResponse.json(
-          {
-            message:
-              "Email delivery is not configured. Set SMTP_USER and SMTP_PASSWORD (Gmail App Password) in the server environment.",
-          },
-          { status: 503 }
-        );
+      if (process.env.NODE_ENV !== "production") {
+        return NextResponse.json({
+          success: true,
+          ok: true,
+          message: "OTP generated in local mode",
+          storage: persisted.backend,
+          emailSent: false,
+          devOtp: otp,
+        });
       }
+
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Email delivery is not configured. Set SMTP_USER and SMTP_PASSWORD (Gmail App Password) in the server environment.",
+        },
+        { status: 503 }
+      );
     }
 
     return NextResponse.json({
+      success: true,
       ok: true,
-      message: mailResult.sent
-        ? "OTP sent to your email"
-        : "OTP generated (configure SMTP to receive email)",
+      message: "OTP sent to your email",
       storage: persisted.backend,
       emailSent: mailResult.sent,
-      ...(process.env.NODE_ENV !== "production" && !mailResult.sent
-        ? { devOtp: otp }
-        : {}),
     });
   } catch (e: unknown) {
     return NextResponse.json(
-      { message: e instanceof Error ? e.message : "Failed to generate OTP" },
+      { success: false, message: e instanceof Error ? e.message : "Failed to generate OTP" },
       { status: 500 }
     );
   }

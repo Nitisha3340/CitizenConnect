@@ -38,13 +38,13 @@ export default function CitizenLayout({
 
   return (
     <ProtectedRoute allowedRoles={["citizen"]}>
-      <div className="flex min-h-screen bg-[#0b1120]">
+      <div className="flex min-h-screen w-full overflow-x-hidden bg-[#0b1120]">
         {/* Sidebar */}
         <CitizenSidebar />
 
         {/* Main Content */}
-        <div className="flex-1 p-10 text-white">
-          
+        <div className="flex-1 min-w-0 overflow-x-hidden p-6 text-white md:p-10">
+
           {/* 🔥 Global Announcement Scroll */}
           <div className="bg-white text-black p-3 rounded-lg overflow-hidden relative mb-6">
             <div className="animate-marquee whitespace-nowrap">

@@ -1,5 +1,4 @@
 "use client";
-import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -8,10 +7,9 @@ export default function PoliticianLayout({
 }: {
   children: React.ReactNode;
 }) {
-   const { logout } = useAuth();
   return (
     <ProtectedRoute allowedRoles={["politician"]}>
-      <div className="flex min-h-screen bg-gradient-to-br from-indigo-900 to-black">
+      <div className="flex min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-indigo-900 to-black">
         
         {/* Sidebar */}
         <div className="w-64 bg-black text-white p-6">
@@ -27,7 +25,7 @@ export default function PoliticianLayout({
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-10 text-white">
+        <div className="flex-1 min-w-0 overflow-x-hidden p-6 text-white md:p-10">
           {children}
         </div>
       </div>

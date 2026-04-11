@@ -42,9 +42,10 @@ export default function SettingsPage() {
 
   return (
     <div className="p-10 w-full">
-      <h1 className="text-3xl font-bold text-white mb-8">
-        Advanced Settings
+      <h1 className="mb-3 text-3xl font-bold text-white">
+        Citizen Settings
       </h1>
+      <p className="mb-8 text-sm text-slate-300">Update your profile, zone, and account security from one place.</p>
         
          {/* ✅ SHOW ERROR HERE */}
       {error && (

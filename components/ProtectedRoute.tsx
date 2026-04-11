@@ -11,10 +11,12 @@ export default function ProtectedRoute({
   children: React.ReactNode;
   allowedRoles: Role[];
 }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    if (loading) return;
+
     if (!user) {
       router.push("/login");
       return;
@@ -23,9 +25,9 @@ export default function ProtectedRoute({
     if (!allowedRoles.includes(user.role)) {
       router.push("/login");
     }
-  }, [user]);
+  }, [allowedRoles, loading, router, user]);
 
-  if (!user || !allowedRoles.includes(user.role)) {
+  if (loading || !user || !allowedRoles.includes(user.role)) {
     return null;
   }
 

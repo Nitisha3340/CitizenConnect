@@ -14,13 +14,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-gray-50 text-gray-900">
+      <body className="min-h-screen overflow-x-hidden bg-[#0b1120] text-white">
         <Providers>
           {/* Toast Notifications */}
           <Toaster position="top-right" />
 
           {/* Main App */}
-          <div className="min-h-screen flex flex-col">
+          <div className="min-h-screen w-full overflow-x-hidden flex flex-col">
             {children}
           </div>
         </Providers>

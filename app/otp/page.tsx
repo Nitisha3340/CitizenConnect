@@ -1,25 +1,32 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
-
-type PendingSignup = {
-  name: string;
-  email: string;
-  password: string;
-  role: any;
-};
+import { useAuth } from "../../context/AuthContext";
+import {
+  getPendingEmailUpdate,
+  getPendingSignup,
+  savePendingEmailUpdate,
+  savePendingSignup,
+} from "../../app/api/storage";
 
 export default function OtpPage() {
+  return (
+    <Suspense fallback={<OtpLoading />}> 
+      <OtpContent />
+    </Suspense>
+  );
+}
+
+function OtpContent() {
   const router = useRouter();
   const params = useSearchParams();
-  const { register } = useAuth();
+  const { register, completeEmailChange } = useAuth();
 
   const emailParam = params.get("email") || "";
-  const purpose = params.get("purpose") || "signup";
+  const purpose = params.get("purpose") || params.get("mode") || "signup";
 
   const [email, setEmail] = useState(emailParam);
   const [otp, setOtp] = useState("");
@@ -47,16 +54,14 @@ export default function OtpPage() {
         body: JSON.stringify({ email, purpose }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data?.message || "Failed to resend OTP");
+      if (!res.ok) throw { response: { data } };
       if (data?.emailSent) {
         toast.success("New code sent — check your Gmail inbox.");
-      } else if (data?.devOtp) {
-        toast.success(`Dev — OTP: ${data.devOtp}`);
       } else {
         toast.success("OTP resent");
       }
     } catch (e: any) {
-      const msg = e?.message || "Failed to resend OTP";
+      const msg = e?.response?.data?.message || e?.message || "Something went wrong";
       setError(msg);
       toast.error(msg);
     } finally {
@@ -83,23 +88,32 @@ export default function OtpPage() {
         body: JSON.stringify({ email, purpose, otp }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data?.message || "OTP verification failed");
+      if (!res.ok) throw { response: { data } };
 
       if (purpose === "signup") {
-        const raw = localStorage.getItem("pendingSignup");
-        if (!raw) throw new Error("Signup details not found. Please sign up again.");
-        const pending = JSON.parse(raw) as PendingSignup;
+        const pending = getPendingSignup();
+        if (!pending) throw new Error("Signup details not found. Please sign up again.");
         await register(pending);
-        localStorage.removeItem("pendingSignup");
+        savePendingSignup(null);
         toast.success("Account created. Please log in.");
         router.push("/login");
+        return;
+      }
+
+      if (purpose === "email-update") {
+        const pending = getPendingEmailUpdate();
+        if (!pending) throw new Error("Email update details not found. Please request a new code.");
+        await completeEmailChange(pending.nextEmail);
+        savePendingEmailUpdate(null);
+        toast.success("Email updated successfully");
+        router.push("/citizen/settings");
         return;
       }
 
       toast.success("OTP verified");
       router.push("/login");
     } catch (e: any) {
-      const msg = e?.message || "OTP verification failed";
+      const msg = e?.response?.data?.message || e?.message || "Something went wrong";
       setError(msg);
       toast.error(msg);
     } finally {
@@ -166,6 +180,23 @@ export default function OtpPage() {
             Go back to Sign up
           </Link>
         </p>
+      </div>
+    </div>
+  );
+}
+
+function OtpLoading() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/10 p-8 shadow-2xl backdrop-blur-xl text-white">
+        <div className="h-6 w-28 animate-pulse rounded-full bg-white/10" />
+        <div className="mt-4 h-8 w-44 animate-pulse rounded-full bg-white/10" />
+        <div className="mt-3 h-4 w-full animate-pulse rounded-full bg-white/10" />
+        <div className="mt-8 space-y-4">
+          <div className="h-12 animate-pulse rounded-xl bg-white/10" />
+          <div className="h-12 animate-pulse rounded-xl bg-white/10" />
+          <div className="h-12 animate-pulse rounded-xl bg-white/10" />
+        </div>
       </div>
     </div>
   );

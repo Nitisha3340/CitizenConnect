@@ -1,84 +1,61 @@
 "use client";
 
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { useEffect, useState } from "react";
-import API from "@/app/api/api";
-import { useRouter } from "next/navigation";
+import { useIssues } from "@/context/IssueContext";
+import LogoutButton from "@/components/LogoutButton";
+import StatsCard from "@/components/StatsCard";
+import IssueCard from "@/components/IssueCard";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 
-export default function ModeratorDashboard() {
-  const { logout } = useAuth();
-  const router = useRouter();
+export default function DashboardPage() {
+  const { user } = useAuth();
+  const { issues, loading } = useIssues();
 
-  const [issues, setIssues] = useState<any[]>([]);
+  if (loading) {
+    return <LoadingSkeleton cards={3} rows={3} />;
+  }
 
-  useEffect(() => {
-    if (!localStorage.getItem("token")) {
-      router.push("/login");
-    }
-  }, []);
-
-  useEffect(() => {
-    API.get("/complaints")
-      .then((res: any) => setIssues(res.data));
-  }, []);
-
-  const deleteIssue = async (id: number) => {
-    await API.delete(`/complaints/${id}`);
-    setIssues(issues.filter((i: any) => i.id !== id));
-  };
+  const total = issues.length;
+  const highSeverity = issues.filter((issue) => issue.severity === "High").length;
 
   return (
-    <div className="min-h-screen bg-[#0b1120] text-white p-10">
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-lg">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.35em] text-cyan-300">Moderator Dashboard</p>
+            <h1 className="mt-2 text-3xl font-semibold text-white">{user?.zone} moderation queue</h1>
+            <p className="mt-2 text-sm text-slate-300">Review and remove offensive issues in your assigned zone.</p>
+          </div>
 
-      <div className="flex justify-between items-center mb-10">
-        <h1 className="text-3xl font-bold">Moderator Dashboard</h1>
-
-        <button
-          onClick={logout}
-          className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:opacity-90 transition duration-200"
-        >
-          Logout
-        </button>
-      </div>
-
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-        <h2 className="text-xl font-semibold mb-6">
-          All Submitted Issues
-        </h2>
-
-        {issues.length === 0 && (
-          <p className="text-gray-400">No issues available.</p>
-        )}
-
-        <div className="space-y-6">
-          {issues.map((issue: any) => (
-            <div
-              key={issue.id}
-              className="bg-white/5 border border-white/10 p-6 rounded-xl flex justify-between items-center hover:bg-white/10 transition"
-            >
-              <div>
-                <h3 className="font-semibold">
-                  {issue.title}
-                </h3>
-                <p className="text-sm text-gray-400">
-                  Raised by: {issue.createdBy}
-                </p>
-                <p className="text-sm text-gray-400">
-                  Status: {issue.status}
-                </p>
-              </div>
-
-              <button
-                onClick={() => deleteIssue(issue.id)}
-                className="bg-red-600 px-4 py-2 rounded-md hover:opacity-90 transition duration-200"
-              >
-                Delete
-              </button>
-            </div>
-          ))}
+          <div className="flex items-center gap-3">
+            <Link href="/moderator/moderation" className="rounded-xl bg-cyan-400 px-4 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300">
+              Open moderation
+            </Link>
+            <LogoutButton />
+          </div>
         </div>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatsCard title="Queue Size" value={total} subtitle="Zone issues visible now" />
+        <StatsCard title="High Severity" value={highSeverity} subtitle="Potential review candidates" />
+        <StatsCard title="Zone" value={user?.zone || "-"} subtitle="Assigned scope" />
+      </div>
+
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-lg">
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold text-white">Recent Issues</h2>
+          <p className="text-sm text-slate-300">Current items in your moderation zone</p>
+        </div>
+
+        <div className="grid gap-4">
+          {issues.slice(0, 3).map((issue) => (
+            <IssueCard key={issue.id} issue={issue} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

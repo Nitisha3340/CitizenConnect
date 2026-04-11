@@ -21,36 +21,41 @@ export async function POST(req: Request) {
 
     if (!email || !otp) {
       return NextResponse.json(
-        { message: "Email and OTP are required" },
+        { success: false, message: "Email and OTP are required" },
         { status: 400 }
       );
     }
 
+    const urlEmail = new URL(req.url).searchParams.get("email");
+    if (urlEmail && urlEmail.trim().toLowerCase() !== email) {
+      return NextResponse.json({ success: false, message: "Email mismatch" }, { status: 400 });
+    }
+
     const record = await getLatestOtp(email, purpose);
     if (!record) {
-      return NextResponse.json({ message: "OTP not found" }, { status: 404 });
+      return NextResponse.json({ success: false, message: "OTP not found" }, { status: 404 });
     }
 
     if (record.used) {
-      return NextResponse.json({ message: "OTP already used" }, { status: 400 });
+      return NextResponse.json({ success: false, message: "OTP already used" }, { status: 400 });
     }
 
     if (Number.isNaN(record.expiresAtMs) || record.expiresAtMs < Date.now()) {
-      return NextResponse.json({ message: "OTP expired" }, { status: 400 });
+      return NextResponse.json({ success: false, message: "OTP expired" }, { status: 400 });
     }
 
     const secret = process.env.OTP_SECRET || "dev-secret";
     const expectedHash = sha256(`${secret}:${email}:${purpose}:${otp}`);
     if (expectedHash !== record.otpHash) {
-      return NextResponse.json({ message: "Invalid OTP" }, { status: 400 });
+      return NextResponse.json({ success: false, message: "Invalid OTP" }, { status: 400 });
     }
 
     await markOtpUsed(record.id, email, purpose, record.backend);
 
-    return NextResponse.json({ ok: true, message: "OTP verified" });
+    return NextResponse.json({ success: true, ok: true, message: "OTP verified" });
   } catch (e: unknown) {
     return NextResponse.json(
-      { message: e instanceof Error ? e.message : "Failed to verify OTP" },
+      { success: false, message: e instanceof Error ? e.message : "Failed to verify OTP" },
       { status: 500 }
     );
   }

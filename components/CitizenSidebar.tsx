@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function CitizenSidebar() {
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const navItems = [
     { name: "Dashboard", href: "/citizen/dashboard" },
@@ -51,6 +53,7 @@ export default function CitizenSidebar() {
       {/* Bottom Footer */}
       <div className="mt-auto pt-10 text-xs text-gray-500 border-t border-white/10">
         <p>Citizen Panel</p>
+        <p className="mt-1 text-cyan-300">{user?.zone || "Unassigned zone"}</p>
         <p className="mt-1">© 2026 CitizenConnect</p>
       </div>
     </aside>
